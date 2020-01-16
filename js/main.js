@@ -30,19 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
   goodsWrapper.appendChild(createCardGoods(2, 'Фламинго', 3000, './img/temp/Flamingo.jpg'));
   goodsWrapper.appendChild(createCardGoods(3, 'Носки', 400, './img/temp/Socks.jpg'));
 
-  const closeCart = (event) => {
-    const target = event.target;
+  const closeCart = (e) => {
+    const target = e.target;
 
     if (target === cart || target.classList.contains('cart-close')) {
       cart.style.display = 'none';
     }
   }
 
-  const openCart = () => {
+  const openCart = (e) => {
+    e.preventDefault();
     cart.style.display = 'flex';
   };
 
   cartBtn.addEventListener('click', openCart);
   cart.addEventListener('click', closeCart);
+
+  document.onkeydown = function(e) {
+    if (e.keyCode == 27) {
+      cart.style.display = 'none';
+    }
+  }
 
 });
