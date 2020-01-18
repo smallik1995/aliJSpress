@@ -4,6 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const wishlistBtn = document.getElementById('wishlist');
   const goodsWrapper = document.querySelector('.goods-wrapper');
   const cart = document.querySelector('.cart');
+  const category = document.querySelector('.category');
+  const preloader = document.getElementById('spinner');
+
+  const getGoods = (handler, filter) => {
+    fetch('./db/db.json')
+      .then(response => response.json())
+      .then(filter)
+      .then(handler)
+      .then(closeSpinner);
+  }
+
+  const loadSpinner = () => {
+    preloader.style.display = 'block';
+  }
+
+  const closeSpinner = () => {
+    preloader.style.display = 'none';
+  }
 
   const createCardGoods = (id, title, price, img) => {
     const card = document.createElement('div');
@@ -23,12 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
       								</div>`
 
     return card;
+  };
+
+  const renderCard = (items) => {
+    goodsWrapper.textContent = '';
+
+      items.forEach(({id, title, price, imgMin}) => {
+        goodsWrapper.appendChild(createCardGoods(id, title, price, imgMin));
+      });
 
   };
 
-  goodsWrapper.appendChild(createCardGoods(1, 'Дартс', 2000, './img/temp/Archer.jpg'));
-  goodsWrapper.appendChild(createCardGoods(2, 'Фламинго', 3000, './img/temp/Flamingo.jpg'));
-  goodsWrapper.appendChild(createCardGoods(3, 'Носки', 400, './img/temp/Socks.jpg'));
+  const randomSort = (items) => items.sort(() => Math.random() - 0.5);
+
+  getGoods(renderCard, randomSort);
 
   const closeCart = (e) => {
     const target = e.target;
@@ -43,8 +69,24 @@ document.addEventListener('DOMContentLoaded', () => {
     cart.style.display = 'flex';
   };
 
+  const choiceCategory = (e) => {
+    e.preventDefault();
+    const target = e.target;
+
+    loadSpinner();
+
+    if (target.classList.contains('category-item')) {
+      const category = target.dataset.category;
+      goodsWrapper.textContent = '';
+      setTimeout(() => {
+        getGoods(renderCard, (goods) => goods.filter( (item) => item.category.includes(category)));
+      },1500);
+    }
+  };
+
   cartBtn.addEventListener('click', openCart);
   cart.addEventListener('click', closeCart);
+  category.addEventListener('click', choiceCategory);
 
   document.onkeydown = function(e) {
     if (e.keyCode == 27) {
